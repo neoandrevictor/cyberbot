@@ -1,0 +1,143 @@
+Nível 1 Le uma tabela de pergunta e resposta. Se a pergunta do chat for igual a da tabela retorna a resposta.
+
+ 
+
+Tem uma página HTML que começa com o bot dando a saudação numa tag p alinhada a esquerda . No estilo whatsapp.
+
+Embaixo tem uma  textarea que você pode perguntar para ele algo escrevendo e depois clicando no botão enviar.
+
+A página cria uma tag p alinhada a direita com a sua resposta.
+
+Uma requisição Ajax para uma página de servidor pergunta pro banco de dados a pergunta e se achar ela responde.
+
+Se não achar responde a mensagem padrão de pergunta não encontrada.
+
+ 
+
+Nível 2 Analisa a pergunta para saber a intenção dela.
+
+ 
+
+Exclui palavras apoio das mensagens e verifica qual pergunta do banco de dados se parece mais com a pergunta do usuário.
+
+ 
+
+Nível 3 Inclui os comandos:!delete e!importfaqcsv
+
+ 
+
+O comando delete apaga a tabela de pergunta e respostas. Já o importfaqcsv importa um arquivo csv de dois campos onde onde o símbolo de seção separa os dois campos e o símbolo de parágrafo separa as linhas.
+
+ 
+
+Nível 4 Inclui o comando!import
+
+ 
+
+O comando import varre o texto separando criando uma matriz usando.?! como separadores. No primeiro campo da matriz é a frase no segundo campo é seu ponto de final.
+
+Se encontra um ponto de interrogação lança ele na tabela como pergunta e a frase seguinte como resposta na tabela.
+
+Se encontra um ponto final ou ponto de exclamação não precedido por frase interrogativa lança ele na tabela como frase interrogativa na pergunta e lança a própria frase como resposta.
+
+Exemplo. Se encontrar a frase: O céu é azul. Lança pro campo de pergunta: O céu é azul?
+
+No português é fácil converter uma frase propositiva em interrogativa.
+
+É claro que o bot nesse instante não sabe responder realidades distintas.
+
+Em cada página o bot tem que ter seu propósito bem definido e quanto melhor as perguntas e respostas salvas no banco de dados melhor a conversação.
+
+ 
+
+Nivel 5  Através de cadeia de pergunta define a realidade
+
+ 
+
+É acionado mais um campo de tabela que diz respeito ao assunto que está sendo perguntado.
+
+Assim antes da conversa o robô pergunta sobre que assunto quer tratar. Como se fosse vários bancos de dados dentro da mesma tabela
+
+O assunto pode ser mudado no meio da conversa pelo comando!assunto (assunto novo)
+
+
+
+Nível 6 Usuários e confiança.
+
+ 
+
+O bot através de login sabe quais são os usuários.
+
+Confiança é um número de 0 a 1 de quanto o bot deve confiar em vc. Isso é informado pelo adm do sistema.
+
+A tabela de pergunta e resposta ganha dois campos. Um sobre o nível de confiança de seu registro e outro de quem ensinou.
+
+Usuários mestres podem usar os comandos especiais.
+
+Agora a confiança é tratada como atenuador do score na hora de retornar a pergunta.
+
+ 
+
+Nível 7 Comando update e delete com id
+
+ 
+
+Agora uma chave primária é adicionada na tabela e podem ser feitos alterações pelos mestres usando o id da pergunta.
+
+ 
+
+Nível 8 Pesquisa no Google
+
+ 
+
+Se o score da resposta for baixo ele pesquisa no Google para aumentar sua base de dados até seu score para perguntas for bom o bastante.
+
+É lógico que isso irá gerar conflito de realidades mas é um paradigma a se quiser quebrado.
+
+ 
+
+Nível 9 Tabela de histórico.
+
+ 
+
+Tudo que é conversado é armazenado em uma tabela de histórico.
+
+ 
+
+Nível 10 Reconhecimento de realidade
+
+ 
+
+O bot ao importar uma página na Internet verifica do que ela se trata e joga as informações no assunto.
+
+ 
+
+Nível 11 Reconhecimento de tempo
+
+ 
+
+O bot tem noção do tempo. Crio um campo de texto onde ele guarda o horário que foi inserido aquela pergunta e outro sobre que tempo se refere aquela informação. Os dois servem como atenuadores do score e se muito antigo escreve na resposta a antiguidade de informaçao.
+
+ 
+
+Nivel 12 Sair do campo de pergunta e resposta e trabalhar com objeto e adjunto adnominal.
+
+ 
+
+Faz análise sintática da frase para guardar informação.
+
+ 
+
+Nivel 13 análise semantica
+
+ 
+
+Faz análise semântica de frases para entender o contexto.
+
+ 
+
+Nivel 14 análise de verdade e mentira
+
+ 
+
+Não sei ainda como fazer isso. 

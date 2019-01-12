@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>CyberBot - Nível 8</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="fuzzymatching.js"></script>
+	<script>
+						
+		function Main(){
+			
+			
+			MensagemAssuntos(AssuntosDiferentes());
+		
+		}
+		
+		//Tabela
+		
+		function AdcionaHistorico(id,usuario,pergunta_usuario,frase_limpa_usuario,pergunta_bot,resposta,score,assunto,confianca,cadastro){
+			
+			datahora=RetornaDataHoraAtual();
+			
+			$("#tabela_historico").append("<tr><td id='h1_"+(id)+"'>"+id+"</td><td id='h2_"+(id)+"'>"+usuario+"</td><td id='h3_"+(id)+"'>"+pergunta_usuario+"</td><td id='h4_"+(id)+"'>"+frase_limpa_usuario+"</td><td id='h5_"+(id)+"'>"+pergunta_bot+"</td><td id='h6_"+(id)+"'>"+resposta+"</td><td id='h7_"+(id)+"'>"+score+"</td><td id='h7_"+(id)+"'>"+datahora+"</td><td id='h7_"+(id)+"'>"+assunto+"</td><td id='h8_"+(id)+"'>"+confianca+"</td><td id='h8_"+(id)+"'>"+cadastro+"</td></tr>");
+			document.getElementById("info_linhas_tabela_historico").innerText=document.getElementById("info_linhas_tabela_historico").innerText*1+1
+		}
+		
+		function AdcionaPerguntaResposta(id,pergunta,resposta,assunto,confianca,cadastro){
+		
+			$("#tabela_respostas").append("<tr><td>"+id+"</td><td id='p"+(id)+"'>"+pergunta+"</td><td id='r"+(id)+"'>"+resposta+"</td><td id='a"+(id)+"'>"+assunto+"</td><td id='c"+(id)+"'>"+confianca+"</td><td id='u"+(id)+"'>"+cadastro+"</td></tr>");
+			document.getElementById("info_linhas").innerText=document.getElementById("info_linhas").innerText*1+1
+		}
+		
+		function AssuntosDiferentes(){
+			
+			vetorassuntos="";
+			
+			for (linha = 1; linha <= Get_Numero_de_Linhas_da_Tabela(); linha++) { 
+				naoehunica=false;
+				
+				splitvetorassuntos=vetorassuntos.split(";");
+				
+				for (k = 0; k < splitvetorassuntos.length; k++) { 
+					
+					if( document.getElementById("a"+linha).innerText.trim().toLowerCase()==splitvetorassuntos[k]){
+						naoehunica=true;
+					}
+				}
+				if (!naoehunica){
+					vetorassuntos=vetorassuntos+";"+document.getElementById("a"+linha).innerText.trim().toLowerCase();	
+				}
+			}
+			
+			return vetorassuntos;
+			
+		}
+		
+		function RetornaDataHoraAtual(){
+			var dNow = new Date();
+			var localdate = dNow.getDate() + '/' + (dNow.getMonth()+1) + '/' + dNow.getFullYear() + ' ' + dNow.getHours() + ':' + dNow.getMinutes();
+			return localdate;
+		}
+		
+		
+		
+		//Chat
+		
+		function BotEscreve(mensagem){		
+			$("#chat").append("<p><div class='bot'><span>"+mensagem+"</span><div></p>");					
+		}
+		
+		function DefineAssunto(numero){
+			
+			vetorassuntos=AssuntosDiferentes();
+			
+			splitvetorassuntos=vetorassuntos.split(";");
+			
+			for (k = 1; k < splitvetorassuntos.length; k++) { 
+					if (numero==k){
+						Set_Assunto(splitvetorassuntos[k]);
+					}
+			}
+		
+		}
+		
+		function ForcaLimpaMsgBox(){
+			
+			if (document.getElementById("mensagem_box").value==String.fromCharCode(10)){
+						document.getElementById("mensagem_box").value='';			
+			}
+		
+		}
+		
+		function LimpraPrimeiroEnter(msg){
+			
+			if (msg.substring(1)==String.fromCharCode(10)){
+						msg=msg.substring(2);			
+			}
+			
+			
+		}
+		
+		function MensagemAssuntos(vetorassuntos){
+		
+			splitvetorassuntos=vetorassuntos.split(";");
+			
+			for (k = 1; k < splitvetorassuntos.length; k++) { 
+					BotEscreve("Digite "+k+" para selecionar o assunto: "+splitvetorassuntos[k]);					
+			}
+		
+		}
+		
+		function SelecionarUsuario(usuario){
+			
+			Set_Usuario(usuario);
+			Set_Confianca(usuario);
+			document.getElementById("login").setAttribute("style","display:none");
+			
+			
+			
+		}
+		
+		//Comandos
+		
+		function EnviarComando(msg){
+			
+			if (msg.toLowerCase().substring(0,10)=="!alldelete" && Get_Confianca()==1){
+			
+				COM_delete();
+			
+			}
+			
+			if (msg.toLowerCase().substring(0,7)=="!faqcsv" && Get_Confianca()==1){
+			
+				COM_faqcsv(msg);
+			
+			}
+			
+			if (msg.toLowerCase().substring(0,7)=="!import" && Get_Confianca()>0.75 ){
+			
+				COM_import(msg);
+			
+			}
+			
+			if (msg.toLowerCase().substring(0,8)=="!assunto"){
+			
+				COM_assunto(msg);
+			
+			}
+			
+			if (msg.toLowerCase().substring(0,6)=="!login"){
+			
+				COM_login();
+			
+			}
+			
+			if (msg.toLowerCase().substring(0,7)=="!delete" && Get_Confianca()==1){
+			
+				COM_delete_especifico(msg);
+			
+			}
+			
+			if (msg.toLowerCase().substring(0,7)=="!update" && Get_Confianca()==1){
+			
+				COM_update(msg);
+			
+			}
+		
+		}
+		
+		function COM_assunto(msg){
+		
+			msg=msg.substring(8);
+			Set_Assunto(msg);
+		
+		}
+		
+		
+		function COM_delete(){
+		
+			document.getElementById("info_linhas").innerText=0;
+			$("#tabela_respostas").empty();
+		
+		}
+		
+		function COM_delete_especifico(msg){
+		
+			
+			id=msg.substring(8);
+			document.getElementById("p"+id).innerText='';
+			document.getElementById("r"+id).innerText='';
+			document.getElementById("a"+id).innerText='';
+			document.getElementById("c"+id).innerText='';
+			document.getElementById("u"+id).innerText='';
+			
+		
+		}
+		
+		function COM_faqcsv(msg){
+			
+			aaa
+			msg=msg.substring(8);
+			contador=Get_Numero_de_Linhas_da_Tabela();
+			
+			vetorlinhas=msg.split("¶");
+			
+			for (linha = 0; linha < vetorlinhas.length; linha++) { 
+				vetorcampos=vetorlinhas[linha].split("§");
+				AdcionaPerguntaResposta(contador+linha+1*1,vetorcampos[0],vetorcampos[1],vetorcampos[2],vetorcampos[3],vetorcampos[4]);				
+				
+			}
+			
+			
+			
+			
+		}
+		
+		function COM_import(msg){
+			
+			
+			assunto=Get_Assunto();
+			confianca=Get_Confianca();
+			usuario=Get_Usuario();
+			
+			
+			msg=msg.substring(7);
+			contador=Get_Numero_de_Linhas_da_Tabela();
+			
+			
+		
+			
+		
+			linha=0;
+			pergunta="";
+			resposta="";
+			for (k = 1; k < msg.length; k++) { 
+				if (msg.substring(k,k+1)!="?" && msg.substring(k,k+1)!="." && msg.substring(k,k+1)!="!" || k==1){
+					
+					while (msg.substring(k,k+1)!="?" && msg.substring(k,k+1)!="." && msg.substring(k,k+11)!="!")  {
+						
+						if (k > msg.length){
+								AdcionaPerguntaResposta(contador+linha+1*1,pergunta,resposta,assunto,confianca,usuario);
+								
+								return;
+							}
+						
+						pergunta=pergunta+msg.substring(k,k+1);
+						k=k+1;						
+					}
+					
+					pergunta=pergunta+"?"
+					k=k+1;
+					
+					if (msg.substring(k-1,k)=="?") {
+					
+						
+						
+						while (msg.substring(k,k+1)!="?" && msg.substring(k,k+1)!="." && msg.substring(k,k+1)!="!")  {
+							
+							if (k > msg.length){
+								AdcionaPerguntaResposta(contador+linha+1*1,pergunta,resposta,assunto,confianca,usuario);
+								
+								return;
+							}
+							
+							resposta=resposta+msg.substring(k,k+1);	
+							k=k+1;							
+						}
+						
+						resposta=resposta+msg.substring(k,k+1);			
+					
+					} else {
+					
+						
+						resposta=pergunta.substring(0,pergunta.length-1)+msg.substring(k-1,k)
+					
+					
+					}
+					
+					
+					if (isNaN(pergunta.substring(0,pergunta.length-1))){
+					
+						AdcionaPerguntaResposta(contador+linha+1*1,pergunta,resposta,assunto,confianca,usuario);
+						
+						linha=linha+1;
+					
+					}
+					pergunta="";
+					resposta="";
+				
+				}
+			}
+			
+			
+			
+			
+		}
+		
+		function COM_login(){
+			document.getElementById("login").setAttribute("style","");
+		}
+		
+		function COM_update(msg){
+		
+			id="";
+			campo="";
+			msg=msg.substring(7);
+			
+			k=1;			
+			while (msg.substring(k,k+1)!="," && k<msg.length){
+				
+				id=id+msg.substring(k,k+1);
+				k=k+1;
+			}
+			
+			k=k+1;
+			
+			while (msg.substring(k,k+1)!=")" && k<msg.length){
+				
+				campo=campo+msg.substring(k,k+1);
+				k=k+1;
+			}
+			
+			msg=msg.substring(k+1)
+			
+			switch(campo) {
+				case '1':
+					document.getElementById("p"+id).innerText=msg;
+					break;
+				case '2':
+					document.getElementById("r"+id).innerText=msg;
+					break;
+				case '3':
+					document.getElementById("a"+id).innerText=msg;
+					break;	
+				case '4':
+					document.getElementById("c"+id).innerText=msg;
+					break;
+				case '5':
+					document.getElementById("u"+id).innerText=msg;
+					break;			
+			}
+			
+			
+		
+		}
+		
+		//IA
+		
+		function ComparaFrases(frase1,frase2){
+			
+			contador=0;
+			vetorfrase1=frase1.split(" ");
+			vetorfrase2=frase2.split(" ");
+			
+			atenuador=0;
+			atenuador=vetorfrase1.length/vetorfrase2.length;
+			
+			if (atenuador>1){
+				
+				atenuador=1/atenuador;
+			
+			}
+			
+			for (k=0; k<vetorfrase1.length ;k++) {
+				
+				for (i=0; i<vetorfrase2.length ;i++) {
+					
+					
+					if (vetorfrase1[k]==vetorfrase2[i]) {
+						
+						contador=contador+1;
+					
+					}
+				
+				
+				}
+				
+				
+				
+				
+			}
+			
+			
+			
+			
+			porcentagem1div2=contador*atenuador/vetorfrase2.length;
+			
+			if (porcentagem1div2>0.99) {
+				porcentagem1div2=0.99;
+			}
+			
+			return porcentagem1div2;
+			
+		
+		}
+		
+		function EnviarMensagem(event,msg) {
+			if (event.which == 13 || event.keyCode == 13) {
+				document.getElementById("mensagem_box").value='';
+				$("#chat").append("<p><div class='me'><span>"+msg+"</span><div></p>");				
+				if (TemAssunto()==false){
+					if (Get_Primeira_Mensagem_Bool()==false){
+					
+						MensagemAssuntos(AssuntosDiferentes());
+						
+					}
+					
+					if (isNaN(msg)){
+						BotEscreve("Selecione um assunto antes.");
+					} else {
+						DefineAssunto(msg);
+					}
+					Set_Primeira_Mensagem_Bool(false);
+		
+					
+					return true;
+					
+				}
+				
+				
+				EnviarResposta(msg.trim());
+			
+			return false;
+			}
+			return true;
+			
+		};
+		
+		function EnviarResposta(msg){
+			
+			
+			assunto=Get_Assunto();
+			
+			if (msg.substring(0,1)=="!"){
+				
+				
+				EnviarComando(msg);
+			
+			}else {
+			
+			msg=msg.toLowerCase();
+			
+			resposta_found=false;
+			
+			for (linha = 1; linha <= Get_Numero_de_Linhas_da_Tabela(); linha++) { 
+				if( document.getElementById("p"+linha).innerText.trim().toLowerCase()==msg && assunto==document.getElementById("a"+linha).innerText.trim().toLowerCase() ){
+					resposta=document.getElementById("r"+linha).innerText;
+					AdcionaHistorico(Get_Numero_de_Linhas_da_Tabela_Historico()+1,Get_Usuario(),msg,msg,document.getElementById("p"+linha).innerText,resposta,1,document.getElementById("a"+linha).innerText,document.getElementById("c"+linha).innerText,document.getElementById("u"+linha).innerText)
+					resposta_found=true;
+				}
+			}
+			
+			if (resposta_found==false){
+				resposta=ProcuraRespostaNivel2(msg);
+			}
+			
+			
+			BotEscreve(resposta);
+			
+			
+			}
+			
+		
+		}
+		
+		function FraseLimpa(frase,fuzzy){
+			
+			novovetorfrase="";
+			
+			fuzzymodo=Get_Fuzzy_Bool();
+			
+			var frase=PalavraLimpa(frase.toLowerCase(),fuzzy);
+			
+			vetorfrase=frase.split(" ");
+			
+			vetorpalavrasnaochave=PalavrasNaoChave();
+			
+			for (g=0; g<vetorfrase.length ;g++) {
+				
+				if (fuzzymodo){
+					if (fuzzy){
+					
+						vetorfrase[g]=FuzzyMatching(vetorfrase[g],0.85)[2];
+					
+					
+					}
+				
+				
+				
+				}
+				
+				
+				for (i=0; i<vetorpalavrasnaochave.length ;i++) {
+					
+					
+					if (vetorfrase[g]==vetorpalavrasnaochave[i]) {
+						
+						vetorfrase[g]="";
+						
+						
+					
+					}
+				
+				
+				}
+				
+				novovetorfrase=""+novovetorfrase+vetorfrase[g]+" ";
+				
+				
+			}
+			
+			novovetorfrase=novovetorfrase.replace( /\s\s+/g, ' ' ).trim();
+						
+			return novovetorfrase;
+			
+		}
+		
+		function PalavraLimpa(palavra){
+		
+			
+			
+								
+			palavra=palavra.replace(String.fromCharCode(13),"");
+					
+			for (k = 33; k <= 47; k++) { 
+			
+				palavra=palavra.replace(String.fromCharCode(k),"");
+				
+			}
+			
+			for (k = 58; k <= 64; k++) { 
+			
+				palavra=palavra.replace(String.fromCharCode(k),"");
+				
+			}
+			
+			for (k = 91; k <= 96; k++) { 
+			
+				palavra=palavra.replace(String.fromCharCode(k),"");
+				
+			}
+			
+			for (k = 123; k <= 191; k++) { 
+			
+				palavra=palavra.replace(String.fromCharCode(k),"");
+				
+			}
+			
+			
+			
+			
+			
+			return palavra;
+			
+		}
+		
+		function PalavrasNaoChave() {
+			
+			listadepalavrasnaochave="é,são,eu,tu,ele,ela,nós,vós,eles,elas,me,te,se,lhe,o,a,nos,vos,lhes,os,as,mim,ti,si,este,esse,aquele,estes,esses,aqueles,esta,essa,aquela,estas,essas,aquelas,isto,isso,aquilo,meu,teu,seu,nosso,vosso,seu,minha,tua,sua,nossa,vossa,sua,meus,teus,seus,nossos,vossos,seus,minhas,tuas,suas,nossas,vossas,suas,qual,quais,cujo,cujos,quanto,quantos,cuja,cujas,quanta,quantas,que,quem,onde,algum,nenhum,todo,outro,muito,pouco,certo,vário,tanto,qualquer,alguns,nenhuns,todos,outros,muitos,poucos,certos,vários,tantos,quantos,quaisquer,alguma,nenhuma,toda,outra,muita,pouca,certa,vária,tanta,quanta,quaisquer,algumas,nenhumas,todas,outras,muitas,poucas,certas,várias,tantas,quantas,alguém,ninguém,tudo,outrem,nada,cada,algo,um,uma,uns,umas,ante,após,até,com,contra,de,das,dos,desde,em,entre,para,por,perante,sem,sob,sobre,no,na,trás,afora,como,conforme,consoante,durante,exceto,feito,fora,mediante,menos,salvo,segundo,senão,tirante,visto,abaixo,acerca,acima,fim,além,antes,invés,par,apesar,através,cima,dentro,depois,diante,frente,à,àquele,do,duma,disto,nas,num,nessa,pelo,pelas,ao,aos,aonde,e,mas,nem,também,porém,contudo,entretanto,todavia,ou,já,ora,quer,seja,logo,portanto,conseguinte,que,porque,assim,pois,porquanto,como,embora,apesar,mais,menos,melhor,contanto,desde,sempre,ah,oh,ai";
+			
+			vetorpalavrasnaochave=listadepalavrasnaochave.split(",");
+			
+			return vetorpalavrasnaochave;
+		}
+		
+		function ProcuraRespostaNivel2(msg) {
+			
+			msgoriginal=msg;
+			msg=FraseLimpa(msg,true);
+			scoreinicial=0;
+			achourespostanivel=false;
+			linhaselecionada=0;
+			
+			resposta="Não sei a resposta para essa pergunta";
+			
+			for (linha = 1; linha <= Get_Numero_de_Linhas_da_Tabela(); linha++) { 
+				
+				
+				if (assunto==document.getElementById("a"+linha).innerText.trim().toLowerCase()){
+					pergunta=FraseLimpa(document.getElementById("p"+linha).innerText.trim().toLowerCase(),false);
+					
+					score=ComparaFrases(msg,pergunta)*document.getElementById("c"+linha).innerText*1;
+					
+					if (score>scoreinicial) {
+						
+						resposta="Tenho "+Math.round(score*100)+"% de certeza que você quis dizer:"+document.getElementById("p"+linha).innerText+" Se sim a resposta é:"+ document.getElementById("r"+linha).innerText;
+						linhaselecionada=linha;
+						achourespostanivel=true;
+						scoreinicial=score;									
+						
+					
+					
+					}
+				
+				}
+				
+				
+			}
+		
+		linha=linhaselecionada;
+		
+		if (achourespostanivel==true){
+			AdcionaHistorico(Get_Numero_de_Linhas_da_Tabela_Historico()+1,Get_Usuario(),msgoriginal,msg,document.getElementById("p"+linha).innerText,document.getElementById("r"+linha).innerText,scoreinicial,document.getElementById("a"+linha).innerText,document.getElementById("c"+linha).innerText,document.getElementById("u"+linha).innerText);
+		} else {
+			AdcionaHistorico(Get_Numero_de_Linhas_da_Tabela_Historico()+1,Get_Usuario(),msgoriginal,msg,resposta,resposta,0,Get_Assunto(),resposta,resposta);
+			
+		}
+		
+		
+		return resposta;
+			
+		}
+		
+		//Get-Set-Have
+		
+		function Get_Assunto(){
+			
+			return document.getElementById("info_assunto").innerText;
+			
+		}
+		
+		function Set_Assunto(assunto){
+			
+			document.getElementById("info_assunto").innerText=assunto;
+			
+		}
+		
+		function Get_Confianca(){
+			
+			return document.getElementById("info_confianca").innerText;
+			
+		}
+		
+		function Set_Confianca(usuario){
+			
+			
+			switch(usuario) {
+				case 't123456':
+					confianca=0;
+					break;
+				case 't123457':
+					confianca=0.9;
+					break;
+				case 't123458':
+					confianca=1;
+					break;	
+				case 'c139036':
+					confianca=1;
+					break;
+				case 'c139037':
+					confianca=1;
+					break;	
+				case 'c139038':
+					confianca=1;
+					break;	
+				case 'c139039':
+					confianca=1;
+					break;						
+				default:
+					confianca=0;
+			}
+			
+			document.getElementById("info_confianca").innerText=confianca;
+			
+		}
+		
+		
+		function Get_Fuzzy_Bool(){
+			
+			if (document.getElementById("info_fuzzy").innerText=="false"){
+				
+				return false;
+			
+			}
+			
+			if (document.getElementById("info_fuzzy").innerText=="true"){
+				
+				return true;
+			
+			}
+		
+		}
+		
+		function Set_Fuzzy_Bool(booleano){
+			
+			if (booleano){
+				
+				document.getElementById("info_fuzzy").innerText=="true";
+				
+			} else {
+				
+				document.getElementById("info_fuzzy").innerText=="false";
+				
+			}
+			
+					
+		}
+		
+		function Get_Numero_de_Linhas_da_Tabela(){
+		
+			
+			return document.getElementById("info_linhas").innerText*1;
+			
+		}
+		
+		function Get_Numero_de_Linhas_da_Tabela_Historico(){
+		
+			
+			return document.getElementById("info_linhas_tabela_historico").innerText*1;
+			
+		}
+		
+		
+		function Get_Primeira_Mensagem_Bool(){
+			
+			if (document.getElementById("info_primeira_mensagem_bool").innerText=="false"){
+				
+				return false;
+			
+			}
+			
+			if (document.getElementById("info_primeira_mensagem_bool").innerText=="true"){
+				
+				return true;
+			
+			}
+		
+		}
+		
+		function Set_Primeira_Mensagem_Bool(booleano){
+			
+			if (booleano){
+				
+				document.getElementById("info_primeira_mensagem_bool").innerText=="true";
+				
+			} else {
+				
+				document.getElementById("info_primeira_mensagem_bool").innerText=="false";
+				
+			}
+			
+					
+		}
+		
+		function Get_Usuario(){
+			
+			return document.getElementById("info_usuario").innerText;
+			
+		}
+		
+		
+		
+		function Set_Usuario(usuario){
+			
+			document.getElementById("info_usuario").innerText=usuario;
+			
+		}
+		
+		function TemAssunto(){
+			
+			if (document.getElementById("info_assunto").innerText!='') {
+				return true;
+			} else {
+				return false;
+			}
+			
+			
+		}
+		
+		
+		
+	
+	</script>
+	
+	<style>
+		
+		.bot{
+			border: solid black 1px;
+			min-width: 110px;
+			box-sizing: border-box;
+			padding:6px 7px 8px 9px;
+		}
+		
+		.me{
+			border: solid black 1px;
+			min-width: 110px;
+			box-sizing: border-box;
+			background-color:rgb(220,248,198);
+			padding:6px 7px 8px 9px;
+		}
+		
+		#mensagem_box{
+			border: solid black 1px;
+			padding: 6px 7px 8px 9px;
+			min-width: 110px;
+			box-sizing: border-box;
+			background-color:rgb(220,248,198);
+			width:100%;
+		}
+		
+		.oculto{
+			border: solid black 1px;
+		}
+		
+		td,th{
+			border: solid black 1px;
+		}
+		
+		#login{
+			
+			width: 100%;
+			height: 100%;
+			z-index: 10;
+			position: fixed;
+			top: 0;
+			left: 0;
+			background: black;
+			opacity: 0.75;
+		
+		
+		}
+		
+		#select_login{
+			position: fixed;
+			top: 50%;
+			left: 50%;
+		}
+		
+		
+	</style>
+	
+	
+</head>
+<body onload="Main()";>
+	<div id="chat">
+		<p><span class="bot">Olá, em que posso ajudar?</span></p>
+	</div>
+	<br>
+  Mensagem:
+  <br>
+	<textarea id="mensagem_box" contenteditable="true" spellcheck="true" 	onkeydown="return EnviarMensagem(event,this.value);" onkeypress="ForcaLimpaMsgBox();"></textarea>
+  <br>
+	<div class="oculto" >
+		<p>Comandos:</p>
+		<p>!alldelete -> Deleta todas as perguntas e respostas da tabela.</p>
+		<p>!faqcsv -> Importa uma matriz de dados onde ¶(alt+20) separa as linhas e §(alt+21) separa os campos. A matriz deve ser colocada depois de um espaço do comando. </p>
+		<p>!import -> Importa um texto automaticamente criando as perguntas e respostas. O assunto é o mesmo da conversa. Depois de um espaço e coloque o texto. </p>
+		<p>!assunto -> Troca o assunto da conversa. O assunto deve ser colocado depois de um espaço do comando. </p>
+		<p>!login -> Chama novamente a tela de login. </p>
+		<p>!delete -> Deleta uma pergunta e resposta da tabela. O número da pergunta deve ser colocado depois de um espaço do comando. </p>
+		<p>!update(id,campo)alteracao -> Altera o conteúdo de um campo de um registro da tabela</p>
+		<table id="tabela_respostas">	
+			<tr>
+				<th>ID</th>
+				<th>Perguntas</th>
+				<th>Respostas</th>
+				<th>Assunto</th>
+				<th>Confiança</th>
+				<th>Cadastro</th>
+			</tr>
+			<tr>
+				<td>1</td>
+				<td id="p1">Qual o horário de funcionamento das agências bancárias?</td>
+				<td id="r1">No caso das agências de bancos múltiplos com carteira comercial, de bancos comerciais e da Caixa Econômica Federal, o horário mínimo de expediente para o público será de cinco horas diárias ininterruptas, com atendimento obrigatório no período de 12h às 15h, horário de Brasília.
+
+	As agências instaladas em municípios onde não haja outra agência de bancos múltiplos com carteira comercial, de bancos comerciais e da Caixa Econômica Federal não estão sujeitas ao horário mínimo nem ao atendimento obrigatório no período de 12h às 15h, horário de Brasília.
+
+	Conforme disposto na Resolução CMN 2.932, de 2002, na Quarta-Feira de Cinzas, no dia 24 de dezembro e em casos excepcionais, tais como festividades locais ou eventos extraordinários, pode ser estabelecido horário especial de funcionamento, desde que garantido o período mínimo de duas horas de atendimento ao público.
+
+	Outras dependências de bancos múltiplos com carteira comercial, de bancos comerciais e da Caixa Econômica Federal, bem como as demais instituições financeiras e instituições autorizadas a funcionar pelo Banco Central do Brasil, a exemplo das cooperativas de crédito, poderão estabelecer, a seu critério e de forma independente, o horário de funcionamento. No entanto, cada dependência é obrigada a divulgar, em local e formato visíveis ao público, o respectivo horário de atendimento.</td>
+				<td id="a1">Funcionamento dos Bancos</td>
+				<td id="c1">1</td>
+				<td id="u1">c139036</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td id="p2">Quais são os dias em que os bancos não abrem para o público?</td>
+				<td id="r2">Não haverá atendimento ao público nas seguintes datas:
+
+					sábados, domingos e feriados;
+					segunda-feira e terça-feira de Carnaval;
+					dia dedicado a Corpus Christi;
+					dia 2 de novembro;
+					último dia útil do ano (de acordo com a Resolução CMN 2.932, de 2002).
+	Os feriados são definidos em leis de âmbito federal, estadual ou municipal.</td>
+					<td id="a2">Funcionamento dos Bancos</td>
+					<td id="c2">1</td>
+					<td id="u2">c139036</td>	
+			</tr>
+			<tr>
+				<td>3</td>
+				<td id="p3">O Banco Central regula o tempo para espera na fila do banco?</td>
+				<td id="r3">Não. O Banco Central não regulamenta o tempo de espera em filas. Existem leis estaduais e municipais que tratam do assunto. Cabe aos órgãos de defesa do consumidor (Procon, Prodecon, Decon) a orientação sobre o tema.</td>
+				<td id="a3">Funcionamento dos Bancos</td>
+				<td id="c3">1</td>
+				<td id="u3">c139036</td>	
+			</tr>
+			<tr>
+				<td>4</td>
+				<td id="p4">Quem tem direito a atendimento preferencial?</td>
+				<td id="r4">Pessoas com deficiência ou com mobilidade reduzida, temporária ou definitiva, idosos com idade igual ou superior a 60 anos, gestantes, lactantes, pessoas acompanhadas por criança de colo e os obesos. Contudo, a matéria não é regulamentada pelo Banco Central nem pelo Conselho Monetário Nacional.</td>
+				<td id="a4">Funcionamento dos Bancos</td>
+				<td id="c4">1</td>
+				<td id="u4">c139036</td>				
+
+			</tr>
+			<tr>
+				<td>5</td>
+				<td id="p5">O banco é obrigado a receber contas de serviços públicos como água, luz e telefone?</td>
+				<td id="r5">Não. O recebimento de contas de serviços públicos (água, luz, telefone etc.) depende de convênio firmado com as companhias prestadoras desses serviços, na forma da Resolução CMN 1.764, de 1990.</td>
+				<td id="a5">Funcionamento dos Bancos</td>
+				<td id="c5">1</td>
+				<td id="u5">c139036</td>				
+
+			</tr>
+			<tr>
+				<td>6</td>
+				<td id="p6"> O banco é obrigado a aceitar pagamento de contas com cheque?</td>
+				<td id="r6">Não. A aceitação de cheque não é obrigatória em nenhuma transação comercial.</td>
+				<td id="a6">Funcionamento dos Bancos</td>
+				<td id="c6">1</td>
+				<td id="u6">c139036</td>				
+
+			</tr>
+			<tr>
+				<td>7</td>
+				<td id="p7">O banco pode impedir o acesso aos guichês de caixas?</td>
+				<td id="r7">Não. Conforme disposto no artigo 3º da Resolução CMN 3.694, de 2009, o banco não pode negar ou restringir o acesso dos clientes e do público usuário aos meios convencionais, inclusive guichês de caixa, mesmo na hipótese de atendimento alternativo ou eletrônico.
+
+	Contudo, tal vedação não se aplica às dependências exclusivamente eletrônicas nem à prestação de serviços de cobrança e de recebimento decorrentes de contratos ou convênios que prevejam canais de atendimento eletrônico.</d>
+				<td id="a7">Funcionamento dos Bancos</td>
+				<td id="c7">1</td>
+				<td id="u7">c139036</td>				
+
+			</tr>
+			<tr>
+				<td>8</td>
+				<td id="p8">Os bancos são obrigados a disponibilizar meios alternativos, como terminais eletrônicos e internet, para a realização de transações bancárias?</td>
+				<td id="r8">Não. A disponibilização de meios alternativos (terminais de autoatendimento, internet banking, transações por telefone, etc.) é uma faculdade do banco, que estabelece as próprias regras de funcionamento e disponibilidade do serviço.
+
+	Caso o banco preste serviços por meios alternativos, ele deve adotar as medidas necessárias para preservar a integridade, a confiabilidade, a segurança e o sigilo das transações realizadas, assim como a legitimidade dos serviços prestados (Resolução CMN 3.694, de 2009).</td>
+				<td id="a8">Funcionamento dos Bancos</td>
+				<td id="c8">1</td>
+				<td id="u8">c139036</td>				
+
+			</tr>
+			<tr>
+				<td>9</td>
+				<td id="p9">O banco pode adiar um saque em espécie?</td>
+				<td id="r9">Sim. O banco pode adiar para o dia seguinte saques acima de R$5 mil, conforme previsto no artigo 2º da Resolução CMN 3.695, de 2009.
+
+	Já para saques e pagamentos em espécie de valor igual ou superior a R$50.000,00 o artigo 9º da Circular 3.461, de 2009, prevê que as instituições devem requerer de seus clientes e de sacadores não clientes comunicação prévia, com, no mínimo, três dias úteis de antecedência.</td>
+				<td id="a9">Funcionamento dos Bancos</td>
+				<td id="c9">1</td>
+				<td id="u9">c139036</td>				
+			</tr>
+		</table>
+		<span>Linhas </span>
+		<span id="info_linhas">9</span>
+		<br>
+		<span>Assunto Selecionado: </span>
+		<span id="info_assunto"></span>
+		<br>
+		<span>Primeira Mensagem Bool:</span>
+		<span id="info_primeira_mensagem_bool">true</span>
+		<br>
+		<span>Usuario:</span>
+		<span id="info_usuario"></span>
+		<br>
+		<span>Confianca:</span>
+		<span id="info_confianca"></span>
+		<br>
+		<span>Fuzzy:</span>
+		<span id="info_fuzzy">true</span>
+		<br>
+		<span>Linhas Tabela Historico</span>
+		<span id="info_linhas_tabela_historico">0</span>
+		<br>		
+		<table id="tabela_historico">
+			<tr>
+				<th>ID</th>
+				<th>Usuário</th>
+				<th>Pergunta do Usuário</th>
+				<th>Frase Limpa do Usuário</th>
+				<th>Pergunta Identificada pelo Bot</th>
+				<th>Resposta dada pelo Bot</th>
+				<th>Score</th>
+				<th>DataHora</th>
+				<th>Assunto</th>
+				<th>Confiança</th>
+				<th>Cadastro</th>
+			</tr>		
+		</table>
+		
+	</div>
+	<div  id="login">
+		<select id="select_login" onchange="SelecionarUsuario(this.value);">
+		  <option value="t123456">João da Silva</option>
+		  <option value="t123457">Jorge Pereira</option>
+		  <option value="t123458">Mestre Miagy</option>
+		  <option value="c139036">André</option>
+		  <option value="c139037">Marcio</option>
+		  <option value="c139038">Jalber</option>
+		  <option value="c139039">Walmor</option>
+		</select>
+	</div>
+	<div id="pagina" class="oculto">
+	
+	</div>
+</
+	
+</body>
+</html>
