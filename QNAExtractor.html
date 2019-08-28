@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Qna Extractor</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 50px;
+        }
+
+        #resposta{
+            border:1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="entrada" placeholder="Digite aqui o texto a ser extraído"></textarea>
+    <button onclick="extrair()">Extrair</button>
+    <textarea id="pergunta" placeholder="Digite aqui a pergunta"></textarea>
+    <button onclick="perguntar()">Perguntar</button>
+    <p id="resposta"></p>
+
+    <script>
+
+        function extrair() {
+            document.getElementById("entrada").value = transformaQuebraDeLinhaEmPonto(document.getElementById("entrada").value.replace(/!/g, ".").replace(/;/g, "."));
+            let vetorEntrada = document.getElementById("entrada").value.split(".");
+            for (let k = 0; k < vetorEntrada.length; k++) {
+                escreverBase(vetorEntrada[k]);
+            }
+
+        }
+
+        function limpaCaracteresInvisiveisComExcecaoDoEspacoETiraExcecoDeEspaco(string) {
+            novaString = "";
+            for (let k = 0; k < string.length; k++) {
+                let bool = false;
+                for (let n = 0; n < 32; n++) {
+                    if (string[k].charCodeAt() == n) {
+                         bool = true;
+                        break;
+                    }
+                }
+                if (!bool){
+                    novaString=novaString+string[k];
+                }
+
+            }
+            return novaString.trim().replace(/\s{2,}/g, ' ');
+        }
+
+        function transformaQuebraDeLinhaEmPonto(string){
+            novaString = "";
+            for (let k = 0; k < string.length; k++) {
+               
+                    if (string[k].charCodeAt() != 10) {
+                        novaString=novaString+string[k];
+                        
+                    } else  {
+                        novaString=novaString+".";
+
+                    }
+              
+                    
+              
+
+            }
+            return novaString;
+        }
+        
+
+        function escreverBase(string) {
+            let p = document.createElement("p");
+            p.setAttribute("class", "base");
+            p.innerText = string;
+            document.body.appendChild(p);
+        }
+
+        function perguntar() {
+            let pergunta = document.getElementById("pergunta").value;
+            pergunta = pergunta.toLowerCase(); 
+            pergunta=limpaCaracteresInvisiveisComExcecaoDoEspacoETiraExcecoDeEspaco(pergunta);           
+            pergunta=FraseLimpa(pergunta);
+            let vetorPergunta=pergunta.split(" ");
+
+            let possiveisRespostas=document.getElementsByClassName("base");
+            
+            let scoreMaximo=-1;
+            let kMaximo=-1;
+            for (let k=0;k<possiveisRespostas.length;k++){
+                let possivelRespostaTratada=limpaCaracteresInvisiveisComExcecaoDoEspacoETiraExcecoDeEspaco(FraseLimpa(possiveisRespostas[k].innerText).toLowerCase())
+                let vetorPossivelRespostaTratada=possivelRespostaTratada.split(" ");
+                let score=-1;
+                for (j=0;j<vetorPossivelRespostaTratada.length;j++){
+                    for (m=0;m<vetorPergunta.length;m++){
+                        if (vetorPergunta[m]==vetorPossivelRespostaTratada[j]){
+                            score++;
+                        }
+                    }
+                }
+                if(score>scoreMaximo){
+                    scoreMaximo=score;
+                    kMaximo=k;
+                }
+
+            }
+
+            if (kMaximo>=0){
+                document.getElementById("resposta").innerText=possiveisRespostas[kMaximo].innerText
+            } else {
+                document.getElementById("resposta").innerText="Não foi possível encontrar uma resposta."
+            }
+
+
+
+
+
+            
+
+
+
+        }
+
+        function FraseLimpa(frase,fuzzy){
+			
+			novovetorfrase="";
+			
+			
+			
+			var frase=PalavraLimpa(frase.toLowerCase(),fuzzy);
+			
+			vetorfrase=frase.split(" ");
+			
+			vetorpalavrasnaochave=PalavrasNaoChave();
+			
+			for (g=0; g<vetorfrase.length ;g++) {
+				
+				
+				
+				
+				for (i=0; i<vetorpalavrasnaochave.length ;i++) {
+					
+					
+					if (vetorfrase[g]==vetorpalavrasnaochave[i]) {
+						
+						vetorfrase[g]="";
+						
+						
+					
+					}
+				
+				
+				}
+				
+				novovetorfrase=""+novovetorfrase+vetorfrase[g]+" ";
+				
+				
+			}
+			
+			novovetorfrase=novovetorfrase.replace( /\s\s+/g, ' ' ).trim();
+						
+			return novovetorfrase;
+			
+		}
+
+        function PalavraLimpa(palavra) {
+
+
+
+
+            palavra = palavra.replace(String.fromCharCode(13), "");
+
+            for (k = 33; k <= 47; k++) {
+
+                palavra = palavra.replace(String.fromCharCode(k), "");
+
+            }
+
+            for (k = 58; k <= 64; k++) {
+
+                palavra = palavra.replace(String.fromCharCode(k), "");
+
+            }
+
+            for (k = 91; k <= 96; k++) {
+
+                palavra = palavra.replace(String.fromCharCode(k), "");
+
+            }
+
+            for (k = 123; k <= 191; k++) {
+
+                palavra = palavra.replace(String.fromCharCode(k), "");
+
+            }
+
+
+
+
+
+            return palavra;
+
+        }
+        function PalavrasNaoChave() {
+
+            listadepalavrasnaochave = "é,são,eu,tu,ele,ela,nós,vós,eles,elas,me,te,se,lhe,o,a,nos,vos,lhes,os,as,mim,ti,si,este,esse,aquele,estes,esses,aqueles,esta,essa,aquela,estas,essas,aquelas,isto,isso,aquilo,meu,teu,seu,nosso,vosso,seu,minha,tua,sua,nossa,vossa,sua,meus,teus,seus,nossos,vossos,seus,minhas,tuas,suas,nossas,vossas,suas,qual,quais,cujo,cujos,quanto,quantos,cuja,cujas,quanta,quantas,que,quem,onde,algum,nenhum,todo,outro,muito,pouco,certo,vário,tanto,qualquer,alguns,nenhuns,todos,outros,muitos,poucos,certos,vários,tantos,quantos,quaisquer,alguma,nenhuma,toda,outra,muita,pouca,certa,vária,tanta,quanta,quaisquer,algumas,nenhumas,todas,outras,muitas,poucas,certas,várias,tantas,quantas,alguém,ninguém,tudo,outrem,nada,cada,algo,um,uma,uns,umas,ante,após,até,com,contra,de,das,dos,desde,em,entre,para,por,perante,sem,sob,sobre,no,na,trás,afora,como,conforme,consoante,durante,exceto,feito,fora,mediante,menos,salvo,segundo,senão,tirante,visto,abaixo,acerca,acima,fim,além,antes,invés,par,apesar,através,cima,dentro,depois,diante,frente,à,àquele,do,duma,disto,nas,num,nessa,pelo,pelas,ao,aos,aonde,e,mas,nem,também,porém,contudo,entretanto,todavia,ou,já,ora,quer,seja,logo,portanto,conseguinte,que,porque,assim,pois,porquanto,como,embora,apesar,mais,menos,melhor,contanto,desde,sempre,ah,oh,ai";
+
+            vetorpalavrasnaochave = listadepalavrasnaochave.split(",");
+
+            return vetorpalavrasnaochave;
+        }
+
+    </script>
+
+</body>
+
+</html>
