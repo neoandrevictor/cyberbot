@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+
+        let duvidaVariavel = "";
+        let contadorPesquisa = 0;
+
+        function pesquisaBing(duvida) {
+
+            if (duvidaVariavel == duvida) {
+                contadorPesquisa++;
+            } else {
+                duvidaVariavel = duvida;
+                contadorPesquisa = 0;
+            }
+
+            let url = "https://www.bing.com/search?q=" + duvida;
+
+            $.getJSON('http://www.whateverorigin.org/get?url=' + encodeURIComponent(url) + '&callback=?', function (data) {
+
+                let meuIframe = document.createElement("iframe");
+
+                document.body.appendChild(meuIframe);
+
+                meuIframe.contentDocument.body.innerHTML = data.contents;
+
+                //$('#pesquisa').html(data.contents);
+
+                let urlSite = meuIframe.contentDocument.body.getElementsByTagName("a")[13 + contadorPesquisa].href;
+
+                $.getJSON('http://www.whateverorigin.org/get?url=' + encodeURIComponent(urlSite) + '&callback=?', function (data) {
+
+
+                    let meuIframe = document.createElement("iframe");
+
+                    document.body.appendChild(meuIframe);
+
+                    meuIframe.contentDocument.body.innerHTML = data.contents;
+
+                    let vetorFAQ = meuIframe.contentDocument.body.innerText.split(".");
+
+                    for (let k = 0; k < vetorFAQ.length; k++) {
+                        let vetorFAQ2 = vetorFAQ[k].split("?");
+                        let tr = document.createElement("tr");
+                        if (vetorFAQ2.length > 1) {
+                            tr.innerHTML = `
+                <td class="pergunta">${vetorFAQ2[0]}</th>
+                <td class="resposta">${vetorFAQ2[1]}</th>
+            `
+
+                        } else {
+                            tr.innerHTML = `
+                <td class="pergunta">${vetorFAQ2[0]}</th>
+                <td class="resposta">${vetorFAQ2[0]}</th>
+            `
+                        }
+                        document.getElementById("conhecimento").appendChild(tr);
+                    }
+
+                    buscar(duvida);
+                });
+            });
+        }
+
+        function comparaPalavras(frase1, frase2) {
+
+            let nivel1 = comparaCaracteres(frase1, frase2);
+
+            if (nivel1 == 1) {
+                //return 1;
+            }
+
+            if (frase1 == undefined || frase2 == undefined) {
+                return 0;
+            }
+
+            let frase1nova2 = frase1.toLowerCase();
+            let frase2nova2 = frase2.toLowerCase();
+
+            frase1nova = "";
+            frase2nova = "";
+
+            let caracterespermitidos = " 0123456789zxcvbnmasdfghjklçqwertyuiop";
+
+            for (let k = 0; k < frase1nova2.length; k++) {
+                let encontrou = false;
+                for (let j = 0; j < caracterespermitidos.length; j++) {
+                    if (frase1nova2[k] == caracterespermitidos[j]) {
+                        encontrou = true;
+                        break;
+                    }
+                }
+                if (encontrou) {
+                    frase1nova = frase1nova + frase1nova2[k];
+                }
+            }
+
+
+            for (let k = 0; k < frase2nova2.length; k++) {
+                let encontrou = false;
+                for (let j = 0; j < caracterespermitidos.length; j++) {
+                    if (frase2nova2[k] == caracterespermitidos[j]) {
+                        encontrou = true;
+                        break;
+                    }
+                }
+                if (encontrou) {
+                    frase2nova = frase2nova + frase2nova2[k];
+                }
+            }
+
+
+            let vetorFrase1 = frase1nova2.split(" ");
+            let vetorFrase2 = frase2nova2.split(" ");
+            let listadepalavrasnaochave = "é,são,eu,tu,ele,ela,nós,vós,eles,elas,me,te,se,lhe,o,a,nos,vos,lhes,os,as,mim,ti,si,este,esse,aquele,estes,esses,aqueles,esta,essa,aquela,estas,essas,aquelas,isto,isso,aquilo,meu,teu,seu,nosso,vosso,seu,minha,tua,sua,nossa,vossa,sua,meus,teus,seus,nossos,vossos,seus,minhas,tuas,suas,nossas,vossas,suas,qual,quais,cujo,cujos,quanto,quantos,cuja,cujas,quanta,quantas,que,quem,onde,algum,nenhum,todo,outro,muito,pouco,certo,vário,tanto,qualquer,alguns,nenhuns,todos,outros,muitos,poucos,certos,vários,tantos,quantos,quaisquer,alguma,nenhuma,toda,outra,muita,pouca,certa,vária,tanta,quanta,quaisquer,algumas,nenhumas,todas,outras,muitas,poucas,certas,várias,tantas,quantas,alguém,ninguém,tudo,outrem,nada,cada,algo,um,uma,uns,umas,ante,após,até,com,contra,de,das,dos,desde,em,entre,para,por,perante,sem,sob,sobre,no,na,trás,afora,como,conforme,consoante,durante,exceto,feito,fora,mediante,menos,salvo,segundo,senão,tirante,visto,abaixo,acerca,acima,fim,além,antes,invés,par,apesar,através,cima,dentro,depois,diante,frente,à,àquele,do,duma,disto,nas,num,nessa,pelo,pelas,ao,aos,aonde,e,mas,nem,também,porém,contudo,entretanto,todavia,ou,já,ora,quer,seja,logo,portanto,conseguinte,que,porque,assim,pois,porquanto,como,embora,apesar,mais,menos,melhor,contanto,desde,sempre,ah,oh,ai";
+            let vetorListadepalavrasnaochave = listadepalavrasnaochave.split(",");
+
+
+            for (let k = 0; k < vetorFrase1.length; k++) {
+                for (let j = 0; j < vetorListadepalavrasnaochave; j++) {
+                    if (vetorFrase1[k] == vetorListadepalavrasnaochave[j]) {
+                        vetorFrase1.splice(k);
+                        k--;
+                        break;
+                    }
+                }
+            }
+
+            for (let k = 0; k < vetorFrase2.length; k++) {
+                for (let j = 0; j < vetorListadepalavrasnaochave; j++) {
+                    if (vetorFrase2[k] == vetorListadepalavrasnaochave[j]) {
+                        vetorFrase2.splice(k);
+                        k--;
+                        break;
+                    }
+                }
+            }
+
+            let contador1 = 0;
+            for (let k = 0; k < vetorFrase1.length; k++) {
+
+                for (let j = 0; j < vetorFrase2.length; j++) {
+                    contador1 = comparaCaracteres(vetorFrase1[k], vetorFrase2[j]);
+
+
+                }
+
+            }
+
+
+
+            return contador1 / (vetorFrase1.length * vetorFrase2.length);
+
+
+
+        }
+
+
+
+
+        function comparaCaracteres(string1, string2) {
+
+            if (string1 == undefined || string2 == undefined) {
+                return 0;
+            }
+
+
+            let string1nova2 = string1.toLowerCase();
+            let string2nova2 = string2.toLowerCase();
+
+            if (string1nova2.indexOf(string2nova2) >= 0) {
+                //return 1;
+            }
+
+            if (string2nova2.indexOf(string1nova2) >= 0) {
+                //return 1;
+            }
+
+
+            string1nova = "";
+            string2nova = "";
+
+            let caracterespermitidos = " 0123456789zxcvbnmasdfghjklçqwertyuiop";
+
+            for (let k = 0; k < string1nova2.length; k++) {
+                let encontrou = false;
+                for (let j = 0; j < caracterespermitidos.length; j++) {
+                    if (string1nova2[k] == caracterespermitidos[j]) {
+                        encontrou = true;
+                        break;
+                    }
+                }
+                if (encontrou) {
+                    string1nova = string1nova + string1nova2[k];
+                }
+            }
+
+
+            for (let k = 0; k < string2nova2.length; k++) {
+                let encontrou = false;
+                for (let j = 0; j < caracterespermitidos.length; j++) {
+                    if (string2nova2[k] == caracterespermitidos[j]) {
+                        encontrou = true;
+                        break;
+                    }
+                }
+                if (encontrou) {
+                    string2nova = string2nova + string2nova2[k];
+                }
+            }
+
+
+
+
+
+            let contador1 = 0;
+            for (let k = 0; k < string1nova.length; k++) {
+
+                if (string1nova[k] == string2nova[k]) {
+                    contador1++;
+                }
+
+            }
+
+            let contador2 = 0;
+            for (let k = 0; k < string2nova.length; k++) {
+
+                if (string1nova[k] == string2nova[k]) {
+                    contador2++;
+                }
+
+            }
+
+
+
+            return ((contador1 / string1nova.length) + (contador2 / string2nova.length)) / 2;
+
+        }
+
+
+
+
+
+        function buscar(elemento) {
+
+            let duvida = elemento.value;
+
+            let fatorDePrecisao = document.getElementById("fatorDePrecisao").value;
+
+            let perguntas = document.getElementsByClassName("pergunta");
+
+            let score = 0;
+            let scoreMax = 0;
+            let kMax = -1;
+
+            for (let k = 0; k < perguntas.length; k++) {
+                score = comparaPalavras(duvida, perguntas[k].innerText);
+
+                if (score >= scoreMax && score > fatorDePrecisao) {
+                    score = scoreMax;
+                    kMax = k;
+                }
+            }
+
+            if (kMax >= 0) {
+                document.getElementById("respostaDoBot").innerText = perguntas[kMax].parentNode.childNodes[1].innerText;
+            } else {
+                pesquisaBing(duvida);
+                document.getElementById("respostaDoBot").innerText = "Pergunta não encontrada pergunte denovo pois estou sempre aprendendo."
+
+            }
+
+
+
+        }
+
+
+
+    </script>
+</head>
+
+<body>
+
+    <div class="conteudo-topo">
+
+        <input style="font-size:300%" type="text" id="buscador" placeholder="Qual a sua duvida?">
+        <input style="font-size:300%;width:650px" value="0" type="number" step="0.1" min="0.0" max="1" id="fatorDePrecisao" placeholder="Fator de Precisão (0,0 à 1)">
+
+        <p style="font-size:300%" id="respostaDoBot"></p>
+
+    </div>
+    <button onclick="buscar(document.getElementById('buscador'))">Perguntar</button>
+    <p id="pesquisa">pesquisa</p>
+    <table id="conhecimento">
+        <tr>
+            <th>Pergunta</th>
+            <th>Resposta</th>
+        </tr>
+
+
+    </table>
+
+
+
+</body>
+
+</html>
