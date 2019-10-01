@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="C:\Users\c139036\Downloads\dynamicspdf.js"></script>
+    <style>
+        .correto {
+            color: green;
+        }
+
+        .incorreto {
+            color: red;
+        }
+    </style>
+</head>
+
+<body >
+
+    <div id="alternativa"></div>
+    <div id="texto"></div>
+    <script>
+
+
+        let frase1nova2 = textao.toLowerCase();
+
+
+        frase1nova = "";
+
+        let caracterespermitidos = " 0123456789zxcvbnmasdfghjklçqwertyuiopáéíóúçãõàâêîôû-";
+
+        for (let k = 0; k < frase1nova2.length; k++) {
+            let encontrou = false;
+            //console.log(k/frase1nova2.length);
+            for (let j = 0; j < caracterespermitidos.length; j++) {
+                if (frase1nova2[k] == caracterespermitidos[j]) {
+                    encontrou = true;
+                    break;
+                }
+            }
+            if (encontrou) {
+                frase1nova = frase1nova + frase1nova2[k];
+            } else {
+                frase1nova = frase1nova + " "
+            }
+        }
+
+        let vetorTextao = frase1nova.trim().split(" ");
+
+        let novaArr = vetorTextao.filter(function (este, i) {
+            return vetorTextao.indexOf(este) === i;
+        });
+
+
+        novaArr = novaArr.sort();
+        novoArrQtd = [];
+
+        for (let k = 0; k < novaArr.length; k++) {
+            console.log(k/novaArr.length);
+            for (let j = 0; j < vetorTextao.length; j++) {
+                if (novaArr[k] == vetorTextao[j]) {
+                    if (novoArrQtd[k] == undefined) {
+                        novoArrQtd[k] = 0;
+
+                    } else {
+                        novoArrQtd[k]++;
+
+                    }
+                }
+            }
+        }
+
+        let objeto=[];
+        
+        for (let k = 0; k < novaArr.length; k++) {
+            objeto.push([novoArrQtd[k],novaArr[k]]);
+        }
+
+        objeto=objeto.sort();
+
+
+
+    </script>
+</body>
+
+
+</html>
