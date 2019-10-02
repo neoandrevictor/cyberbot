@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Auto Digitador</title>
+
+    <style>
+        .correto {
+            color: green;
+        }
+
+        .incorreto {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="textao"></textarea>
+    <button onclick="gerar()">Gerar</button>
+    <input type="checkbox" id="poesia">Poesia
+    <script>
+
+
+        let vetorDuplo = [[]];
+        let textao ="";
+        function proximaPalavra(palavraAnterior) {
+            let vetorPossibilidades = [];
+            //console.log(vetorPossibilidades);
+
+            for (k = 0; k < vetorDuplo.length; k++) {
+                if (vetorDuplo[k][0] == palavraAnterior && vetorDuplo[k][1] != "") {
+                    vetorPossibilidades.push(vetorDuplo[k][1]);
+                }
+            }
+
+            if (vetorPossibilidades.length == 0) {
+                return vetorDuplo[getRandomInt(0, vetorDuplo.length)][0];
+
+            } else {
+                return vetorPossibilidades[getRandomInt(0, vetorPossibilidades.length)];
+            }
+
+        }
+
+        function gerarTexto(palavraInicial, numeroDePalavras) {
+
+            let h1 = document.createElement("h1");
+            h1.innerText = palavraInicial;
+            document.body.appendChild(h1);
+
+            for (let k = 0; k < numeroDePalavras; k++) {
+
+                let spam = document.createElement("spam");
+                spam.innerText = palavraInicial;
+                document.body.appendChild(spam);
+
+                let spame = document.createElement("spam");
+                if ((palavraInicial.indexOf(".") > 0 && getRandomInt(0, 3) > 1  && document.getElementById("poesia").checked==false) || (document.getElementById("poesia").checked==true && k%5==0 )){
+                    spame.innerHTML = "<br>";
+                    if (document.getElementById("poesia").checked==true && k%20==0 && k!=0){
+                        
+                        spame.innerHTML = "<br><br>";
+                    }
+
+                } else {
+                    spame.innerText = " ";
+                }
+                document.body.appendChild(spame);
+
+                palavraInicial = proximaPalavra(palavraInicial);
+            }
+        }
+        
+        function getRandomInt(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+    
+
+        function gerar() {
+             textao = document.getElementById("textao").value;
+
+
+
+            let frase1nova2 = textao.toUpperCase();
+
+
+            let frase1nova = "";
+
+            let caracterespermitidos = " -zxcvbnmasdfghjklçqwertyuiopáéíóúçãõàâêîôû.?!";
+            caracterespermitidos = caracterespermitidos.toUpperCase();
+
+            for (let k = 0; k < frase1nova2.length; k++) {
+                let encontrou = false;
+               
+                    console.log(k / frase1nova2.length);
+               
+                for (let j = 0; j < caracterespermitidos.length; j++) {
+                    if (frase1nova2[k] == caracterespermitidos[j]) {
+                        encontrou = true;
+                        break;
+                    }
+                }
+                if (encontrou) {
+                    frase1nova = frase1nova + frase1nova2[k];
+                } else {
+                    frase1nova = frase1nova + " "
+                }
+            }
+
+            let vetorTextao = frase1nova.trim().split(" ");
+
+         
+
+          
+
+            for (k = 0; k < vetorTextao.length - 1; k++) {
+                vetorDuplo.push([vetorTextao[k], vetorTextao[k + 1]]);
+            }
+
+            //console.log(vetorDuplo);
+            gerarTexto(vetorDuplo[getRandomInt(0, vetorDuplo.length)][0], vetorDuplo.length);
+
+        }
+
+    </script>
+</body>
+
+
+</html>
