@@ -245,7 +245,7 @@
                 document.getElementById("chat").appendChild(p);
                 
 
-                let vetorMsg=msg.split(" ");
+                let vetorMsg=msg.toUpperCase().split(" ");
                 for (let k=0;k<vetorMsg.length;k++){
                     for (let j=0;j<vetorpalavrasnaochave.length;j++){
                         if (vetorMsg[k].toLowerCase()==vetorpalavrasnaochave[j]){
