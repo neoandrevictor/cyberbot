@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ultrabot</title>
+
+    <style>
+        .correto {
+            color: green;
+        }
+
+        .incorreto {
+            color: red;
+        }
+    </style>
+    <style>
+        .bot {
+            border: solid black 1px;
+            min-width: 110px;
+            box-sizing: border-box;
+            padding: 6px 7px 8px 9px;
+            width: max-content;
+        }
+
+        .me {
+            border: solid black 1px;
+            min-width: 110px;
+            box-sizing: border-box;
+            background-color: rgb(220, 248, 198);
+            padding: 6px 7px 8px 9px;
+            width: max-content;
+        }
+
+        #mensagem_box {
+            border: solid black 1px;
+            padding: 6px 7px 8px 9px;
+            min-width: 110px;
+            box-sizing: border-box;
+            background-color: rgb(220, 248, 198);
+            width: 100%;
+        }
+
+        .oculto {
+            border: solid black 1px;
+        }
+
+        td,
+        th {
+            border: solid black 1px;
+        }
+
+        #login {
+
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: black;
+            opacity: 0.75;
+
+
+        }
+
+        #select_login {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="alma">
+        <textarea id="textao"></textarea>
+        <button onclick="gerar()">Carregar Alma</button>
+        <input style="display: none" type="checkbox" id="poesia">
+    </div>
+    <div id="chat">
+        <p>
+            <span class="bot">Olá, em que posso ajudar?</span>
+        </p>
+    </div>
+    <br> Mensagem:
+    <br>
+    <textarea id="mensagem_box" contenteditable="true" spellcheck="true" onkeydown="return EnviarMensagem(event,this.value);"
+        ></textarea>
+    <br>
+    <script>
+
+
+        let vetorDuplo = [[]];
+        let textao = "";
+        
+        let listadepalavrasnaochave="é,são,eu,tu,ele,ela,nós,vós,eles,elas,me,te,se,lhe,o,a,nos,vos,lhes,os,as,mim,ti,si,este,esse,aquele,estes,esses,aqueles,esta,essa,aquela,estas,essas,aquelas,isto,isso,aquilo,meu,teu,seu,nosso,vosso,seu,minha,tua,sua,nossa,vossa,sua,meus,teus,seus,nossos,vossos,seus,minhas,tuas,suas,nossas,vossas,suas,qual,quais,cujo,cujos,quanto,quantos,cuja,cujas,quanta,quantas,que,quem,onde,algum,nenhum,todo,outro,muito,pouco,certo,vário,tanto,qualquer,alguns,nenhuns,todos,outros,muitos,poucos,certos,vários,tantos,quantos,quaisquer,alguma,nenhuma,toda,outra,muita,pouca,certa,vária,tanta,quanta,quaisquer,algumas,nenhumas,todas,outras,muitas,poucas,certas,várias,tantas,quantas,alguém,ninguém,tudo,outrem,nada,cada,algo,um,uma,uns,umas,ante,após,até,com,contra,de,das,dos,desde,em,entre,para,por,perante,sem,sob,sobre,no,na,trás,afora,como,conforme,consoante,durante,exceto,feito,fora,mediante,menos,salvo,segundo,senão,tirante,visto,abaixo,acerca,acima,fim,além,antes,invés,par,apesar,através,cima,dentro,depois,diante,frente,à,àquele,do,duma,disto,nas,num,nessa,pelo,pelas,ao,aos,aonde,e,mas,nem,também,porém,contudo,entretanto,todavia,ou,já,ora,quer,seja,logo,portanto,conseguinte,que,porque,assim,pois,porquanto,como,embora,apesar,mais,menos,melhor,contanto,desde,sempre,ah,oh,ai";
+			
+       let vetorpalavrasnaochave=listadepalavrasnaochave.split(",");
+
+
+        function primeiraMaiuscula(text) {
+            var words = text.toLowerCase().split(" ");
+            for (var a = 0; a < words.length; a++) {
+                var w = words[a];
+                words[a] = w[0].toUpperCase() + w.slice(1);
+            }
+            return words.join(" ");
+        }
+
+        function proximaPalavra(palavraAnterior) {
+            let vetorPossibilidades = [];
+            //console.log(vetorPossibilidades);
+
+            for (k = 0; k < vetorDuplo.length; k++) {
+                if (vetorDuplo[k][0] == palavraAnterior && vetorDuplo[k][1] != "") {
+                    vetorPossibilidades.push(vetorDuplo[k][1]);
+                }
+            }
+
+            if (vetorPossibilidades.length == 0) {
+                return vetorDuplo[getRandomInt(0, vetorDuplo.length)][0];
+
+            } else {
+                return vetorPossibilidades[getRandomInt(0, vetorPossibilidades.length)];
+            }
+
+        }
+
+        function gerarTexto(palavraInicial, numeroDePalavras) {
+
+            let h1 = document.createElement("h1");
+            h1.innerText = palavraInicial;
+            document.body.appendChild(h1);
+
+            for (let k = 0; k < numeroDePalavras; k++) {
+
+                let spam = document.createElement("spam");
+                spam.innerText = palavraInicial;
+                document.body.appendChild(spam);
+
+                let spame = document.createElement("spam");
+                if ((palavraInicial.indexOf(".") > 0 && getRandomInt(0, 3) > 1 && document.getElementById("poesia").checked == false) || (document.getElementById("poesia").checked == true && k % 5 == 0)) {
+                    spame.innerHTML = "<br>";
+                    if (document.getElementById("poesia").checked == true && k % 20 == 0 && k != 0) {
+
+                        spame.innerHTML = "<br><br>";
+                    }
+
+                } else {
+                    spame.innerText = " ";
+                }
+                document.body.appendChild(spame);
+
+                palavraInicial = proximaPalavra(palavraInicial);
+            }
+        }
+
+        function gerarTextoString(palavraInicial) {
+
+           
+            let resposta = "";
+
+
+            for (let k = 0; k < 100; k++) {
+
+
+
+                palavraInicial = proximaPalavra(palavraInicial);
+                resposta = resposta + " " + palavraInicial;
+
+                if (palavraInicial.indexOf(".") > 0 || palavraInicial.indexOf("!") > 0 || palavraInicial.indexOf("?") > 0) {
+                    break;
+                }
+
+            }
+
+            return resposta;
+        }
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+
+        function gerar() {
+
+            document.getElementById("alma").style.display = "none";
+
+            textao = document.getElementById("textao").value;
+
+
+
+            let frase1nova2 = textao.toUpperCase();
+
+
+            let frase1nova = "";
+
+            let caracterespermitidos = " -zxcvbnmasdfghjklçqwertyuiopáéíóúçãõàâêîôû.?!1234567890";
+            caracterespermitidos = caracterespermitidos.toUpperCase();
+
+            for (let k = 0; k < frase1nova2.length; k++) {
+                let encontrou = false;
+
+                console.log(k / frase1nova2.length);
+
+                for (let j = 0; j < caracterespermitidos.length; j++) {
+                    if (frase1nova2[k] == caracterespermitidos[j]) {
+                        encontrou = true;
+                        break;
+                    }
+                }
+                if (encontrou) {
+                    frase1nova = frase1nova + frase1nova2[k];
+                } else {
+                    frase1nova = frase1nova + " "
+                }
+            }
+
+            let vetorTextao = frase1nova.trim().split(" ");
+
+
+
+
+
+            for (k = 0; k < vetorTextao.length - 1; k++) {
+                vetorDuplo.push([vetorTextao[k], vetorTextao[k + 1]]);
+            }
+
+            //console.log(vetorDuplo);
+            //gerarTexto(vetorDuplo[getRandomInt(0, vetorDuplo.length)][0], vetorDuplo.length);
+
+        }
+
+
+        function EnviarMensagem(event, msg) {
+            if (event.which == 13 || event.keyCode == 13) {
+                document.getElementById("mensagem_box").value = '';
+                let p = document.createElement("p");
+                p.innerHTML = "<div class='me'><span>" + msg + "</span><div>"
+                document.getElementById("chat").appendChild(p);
+                
+
+                let vetorMsg=msg.split(" ");
+                for (let k=0;k<vetorMsg.length;k++){
+                    for (let j=0;j<vetorpalavrasnaochave.length;j++){
+                        if (vetorMsg[k].toLowerCase()==vetorpalavrasnaochave[j]){
+                            vetorMsg.splice(k,1);
+                            
+                            k--;
+                            break;
+                        }
+                    }
+
+
+                }
+
+                
+
+                let resposta = gerarTextoString(vetorMsg[getRandomInt(0,vetorMsg.length)]);
+
+                let pbot = document.createElement("p");
+                pbot.innerHTML = "<div class='bot'><span>" + resposta + "</span><div>"
+                document.getElementById("chat").appendChild(pbot);
+
+
+                
+                let frase1nova2 = msg.toUpperCase();
+
+
+                let frase1nova = "";
+
+                let caracterespermitidos = " -zxcvbnmasdfghjklçqwertyuiopáéíóúçãõàâêîôû.?!1234567890";
+                caracterespermitidos = caracterespermitidos.toUpperCase();
+
+                for (let k = 0; k < frase1nova2.length; k++) {
+                    let encontrou = false;
+
+                    console.log(k / frase1nova2.length);
+
+                    for (let j = 0; j < caracterespermitidos.length; j++) {
+                        if (frase1nova2[k] == caracterespermitidos[j]) {
+                            encontrou = true;
+                            break;
+                        }
+                    }
+                    if (encontrou) {
+                        frase1nova = frase1nova + frase1nova2[k];
+                    } else {
+                        frase1nova = frase1nova + " "
+                    }
+                }
+
+                let vetorTextao = frase1nova.trim().split(" ");
+
+
+
+
+
+                for (k = 0; k < vetorTextao.length - 1; k++) {
+                    vetorDuplo.push([vetorTextao[k], vetorTextao[k + 1]]);
+                }
+
+
+
+                return false;
+            }
+            return true;
+
+        };
+
+
+    </script>
+</body>
+
+
+</html>
